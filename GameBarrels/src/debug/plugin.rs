@@ -3,6 +3,8 @@ use bevy::{
     prelude::*,
 };
 
+use crate::player::types::Player;
+
 pub struct DebugStrings {
     fps: f32,
     x: f32,
@@ -71,7 +73,11 @@ fn start_text(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(debug_strings);
 }
 
-fn set_text(diagnostics: Res<Diagnostics>, mut query: Query<(&mut Text, &mut DebugStrings)>) {
+fn set_text(
+    diagnostics: Res<Diagnostics>,
+    player: Res<Player>,
+    mut query: Query<(&mut Text, &mut DebugStrings)>,
+) {
     for (mut text, mut debug_str) in query.iter_mut() {
         let mut fps: f32 = 0.0;
         if let Some(fps_diagnostic) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
@@ -81,6 +87,8 @@ fn set_text(diagnostics: Res<Diagnostics>, mut query: Query<(&mut Text, &mut Deb
         }
 
         debug_str.fps = fps;
+        debug_str.x = player.x;
+        debug_str.y = player.y;
 
         text.sections[0].value = debug_str.to_string();
     }
