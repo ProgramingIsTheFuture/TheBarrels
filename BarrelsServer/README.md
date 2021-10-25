@@ -1,4 +1,4 @@
 # BarrelsServer
 
 - [ ] Handle Disconnect
-- [ ] Use redis to store Users and Users data
+- [ ] Store Users and Users data
