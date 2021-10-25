@@ -38,10 +38,12 @@ impl Plugin for DebugPlugin {
     }
 }
 
+// Function to spwan the debug text on the screen
 fn start_text(mut commands: Commands, asset_server: Res<AssetServer>) {
     // UI camera
     commands.spawn_bundle(UiCameraBundle::default());
 
+    // Initialize the debug string (fps: 0, x: 0, y: 0)
     let debug_strings = DebugStrings::new();
 
     commands
@@ -73,6 +75,8 @@ fn start_text(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(debug_strings);
 }
 
+// This function set the value of the string
+// this will update the debug text with user info and with the FPS
 fn set_text(
     diagnostics: Res<Diagnostics>,
     player: Res<Player>,

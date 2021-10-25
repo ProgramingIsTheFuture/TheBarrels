@@ -27,6 +27,9 @@ type Server struct {
 	clients []*Client
 }
 
+// Check if the IP is stored
+// If the IP is stored this will update
+// Return false if the IP is not stored
 func (s *Server) CheckByIP(ip string, shouldUpdate bool, c *ClientSend) bool {
 	for _, i := range s.clients {
 		if i.IP == ip {
@@ -41,6 +44,7 @@ func (s *Server) CheckByIP(ip string, shouldUpdate bool, c *ClientSend) bool {
 	return false
 }
 
+// Append new user to the server
 func (s *Server) InsertNewUser(c *Client) {
 	s.clients = append(s.clients, c)
 }

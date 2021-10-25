@@ -29,6 +29,7 @@ fn main() {
 }
 
 fn setup_camera(mut commands: Commands) {
+    // Spawn the camera perspective
     commands.spawn_bundle(PerspectiveCameraBundle {
         transform: Transform::from_xyz(00.0, 00.0, 50.0)
             .looking_at(Vec3::from([0.0, 0.0, 0.0]), Vec3::Y),
@@ -44,6 +45,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
+    // Insert character sprites
     commands.insert_resource(player::types::PlayerType {
         player: materials.add(asset_server.load("sprites/default.png").into()),
     });

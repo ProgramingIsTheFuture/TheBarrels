@@ -13,7 +13,6 @@ pub struct PlayerPlugin {}
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_startup_stage("Spawn player", SystemStage::single(setup_player.system()))
-            .add_system(focus_camera.system())
             .add_system(move_champ.system());
     }
 }
@@ -35,6 +34,7 @@ fn setup_player(mut commands: Commands, player_type: Res<PlayerType>) {
         .insert(PlayerInfo);
 }
 
+// This func receives the speed base on the character number
 fn get_speed(char_code: i8) -> f32 {
     match char_code {
         2 => 1.0,
@@ -44,13 +44,19 @@ fn get_speed(char_code: i8) -> f32 {
     }
 }
 
+// This receives the user input and moves the player around
 fn move_champ(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<&mut Transform, With<PlayerInfo>>,
+    mut query: QuerySet<(
+        Query<&mut Transform, With<PlayerInfo>>,
+        Query<(&mut Transform, &Camera)>,
+    )>,
     mut player: ResMut<Player>,
 ) {
-    for mut transform in query.iter_mut() {
+    for mut transform in query.q0_mut().iter_mut() {
+        // Receiving the speed for this character
         let speed = get_speed(player.char_code);
+
         if keyboard_input.pressed(KeyCode::W) {
             transform.translation.y += speed;
             player.y = transform.translation.y;
@@ -68,10 +74,9 @@ fn move_champ(
             player.x = transform.translation.x;
         }
     }
-}
 
-fn focus_camera(mut query: Query<(&mut Transform, &Camera)>, player: Res<Player>) {
-    for (mut transform, camera) in query.iter_mut() {
+    // This func is going to focus the camera on the character
+    for (mut transform, camera) in query.q1_mut().iter_mut() {
         if camera.name == Some(CAMERA_3D.to_string()) {
             transform.translation.x = player.x;
             transform.translation.y = player.y;

@@ -17,7 +17,7 @@ impl Default for Player {
         let uuid = Uuid::new_v4();
         println!("{:?}", uuid.as_bytes());
         // let id = std::str::from_utf8(uuid.as_bytes()).expect("Failed converting");
-        let id = "aaaa";
+        let id = uuid.to_hyphenated().to_string();
         Self {
             id: id.to_string(),
             username: id.to_string(),

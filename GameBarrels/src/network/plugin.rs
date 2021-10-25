@@ -12,8 +12,7 @@ pub struct Network {
 
 impl Default for Network {
     fn default() -> Self {
-        // let socket = net::UdpSocket::bind("127.0.0.1:8888").expect("");
-        let socket = net::UdpSocket::bind("127.0.0.1:7777").expect("");
+        let socket = net::UdpSocket::bind("127.0.0.1:8888").expect("");
         socket.set_nonblocking(true).expect("Non Blocking failed");
         let server = net::SocketAddr::new(net::IpAddr::V4(net::Ipv4Addr::new(127, 0, 0, 1)), 9999);
         Self { socket, server }
@@ -30,6 +29,7 @@ impl Plugin for NetworkPlugin {
     }
 }
 
+// insert the network resource
 fn start_network(mut commands: Commands) {
     commands.insert_resource(Network::default());
 }
@@ -70,6 +70,9 @@ fn recv_data(
 ) {
     let mut buf = [0; 1024];
 
+    // This will try to receiv data
+    // if the data is not ready, this wont block
+    // if happends an error, it will just ignore it
     let (size, _) = loop {
         match network.socket.recv_from(&mut buf) {
             Ok(n) => break n,
@@ -78,13 +81,16 @@ fn recv_data(
         }
     };
 
+    // Convert bytes to string
     let receiv = std::str::from_utf8(&buf[..size]).unwrap();
 
+    // Deserialize the data as string
     let player: Player = match serde_json::from_str(receiv) {
         Ok(v) => v,
         Err(_) => return,
     };
 
+    // This check if the user exists and update it
     for (mut p, mut transform) in query.iter_mut() {
         if p.id == player.id {
             println!(
@@ -101,6 +107,7 @@ fn recv_data(
         continue;
     }
 
+    // Spwan a new user
     commands
         .spawn_bundle(SpriteBundle {
             material: player_type.player.clone(),
