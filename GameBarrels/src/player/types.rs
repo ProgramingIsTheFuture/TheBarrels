@@ -22,7 +22,7 @@ impl Default for Player {
             username: id.to_string(),
             x: 0.0,
             y: 0.0,
-            direction: 1,
+            direction: 3,
             moving: false,
             char_code: 1,
         }

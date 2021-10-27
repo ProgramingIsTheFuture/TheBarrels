@@ -43,8 +43,8 @@ func Server(ctx context.Context, address string) (err error) {
 			if !exists {
 				serv.InsertNewUser(&client)
 			}
-			if len(serv.Clients) == 1 {
-				fmt.Println("servClients: - ", serv.Clients[0].Client.X, serv.Clients[0].Client.Y)
+			if len(serv.Clients) >= 1 {
+				fmt.Println("servClients: - ", serv.Clients[0].Client.Direction, serv.Clients[0].Client.Moving)
 
 			}
 			recv <- serv

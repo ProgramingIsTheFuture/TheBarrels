@@ -19,6 +19,7 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_startup_stage("Spawn player", SystemStage::single(setup_player.system()))
             .add_system(move_champ.system())
+            .add_system(animate_o_players.system())
             .add_system(animate_sprite_system.system());
     }
 }
@@ -37,9 +38,10 @@ fn setup_player(
         4,
     );
 
+    let texture = texture_atlases.add(h);
     commands
         .spawn_bundle(SpriteSheetBundle {
-            texture_atlas: texture_atlases.add(h),
+            texture_atlas: texture,
             transform: Transform {
                 translation: Vec3::new(0., 0., 3.),
                 scale: Vec3::new(0.2, 0.2, 0.2),
@@ -118,9 +120,39 @@ fn move_champ(
     }
 }
 
+fn animate_o_players(
+    time: Res<Time>,
+    mut query: Query<(&mut Timer, &mut TextureAtlasSprite, &Player)>,
+) {
+    for (mut timer, mut sprite, p) in query.iter_mut() {
+        timer.tick(time.delta());
+        if timer.finished() {
+            let move_dir = p.direction;
+
+            if !p.moving {
+                sprite.index = (move_dir - 3) as u32;
+                continue;
+            }
+
+            if (move_dir - 3) > (sprite.index as i8) || (sprite.index as i8) > move_dir {
+                sprite.index = (move_dir - 3) as u32;
+                continue;
+            }
+
+            if move_dir == (sprite.index as i8) {
+                sprite.index = (move_dir - 3) as u32;
+                continue;
+            }
+
+            sprite.index += 1;
+            continue;
+        }
+    }
+}
+
 fn animate_sprite_system(
     time: Res<Time>,
-    mut query: Query<(&mut Timer, &mut TextureAtlasSprite)>,
+    mut query: Query<(&mut Timer, &mut TextureAtlasSprite), With<PlayerInfo>>,
     player: Res<Player>,
 ) {
     for (mut timer, mut sprite) in query.iter_mut() {
@@ -137,10 +169,12 @@ fn animate_sprite_system(
                 sprite.index = (move_dir - 3) as u32;
                 continue;
             }
+
             if move_dir == (sprite.index as i8) {
                 sprite.index = (move_dir - 3) as u32;
                 continue;
             }
+
             sprite.index += 1;
             continue;
         }

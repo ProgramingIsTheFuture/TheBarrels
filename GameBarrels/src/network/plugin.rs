@@ -12,7 +12,7 @@ pub struct Network {
 
 impl Default for Network {
     fn default() -> Self {
-        let socket = net::UdpSocket::bind("127.0.0.1:8888").expect("");
+        let socket = net::UdpSocket::bind("127.0.0.1:7777").expect("");
         socket.set_nonblocking(true).expect("Non Blocking failed");
         let server = net::SocketAddr::new(net::IpAddr::V4(net::Ipv4Addr::new(127, 0, 0, 1)), 9999);
         Self { socket, server }
@@ -94,14 +94,12 @@ fn recv_data(
     // This check if the user exists and update it
     for (mut p, mut transform) in query.iter_mut() {
         if p.id == player.id {
-            println!(
-                "Updating - {} - {} - {}",
-                player.x, player.y, player.username
-            );
             transform.translation.x = player.x;
             transform.translation.y = player.y;
             p.x = player.x;
             p.y = player.y;
+            p.direction = player.direction;
+            p.moving = player.moving;
 
             return;
         }
@@ -116,15 +114,17 @@ fn recv_data(
     );
 
     // Spwan a new user
+    let texture = texture_atlases.add(h);
     commands
         .spawn_bundle(SpriteSheetBundle {
-            texture_atlas: texture_atlases.add(h),
+            texture_atlas: texture,
             transform: Transform {
                 translation: Vec3::new(0., 0., 3.),
-                scale: Vec3::new(0.001, 0.001, 0.001),
+                scale: Vec3::new(0.2, 0.2, 0.2),
                 ..Default::default()
             },
             ..Default::default()
         })
+        .insert(Timer::from_seconds(0.05, true))
         .insert(player);
 }

@@ -1,5 +1,6 @@
 package ports
 
 type Database interface {
-	Get(string)
+	Get(string, interface{})
+	GetAll()
 }

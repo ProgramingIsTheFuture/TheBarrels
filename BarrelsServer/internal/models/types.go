@@ -6,11 +6,13 @@ type Client struct {
 }
 
 type ClientSend struct {
-	ID       string  `json:"id"`
-	X        float32 `json:"x"`
-	Y        float32 `json:"y"`
-	CharCode int8    `json:"char_code"`
-	Username string  `json:"username"`
+	ID        string  `json:"id"`
+	X         float32 `json:"x"`
+	Y         float32 `json:"y"`
+	Direction int8    `json:"direction"`
+	Moving    bool    `json:"moving"`
+	CharCode  int8    `json:"char_code"`
+	Username  string  `json:"username"`
 }
 
 type Server struct {
