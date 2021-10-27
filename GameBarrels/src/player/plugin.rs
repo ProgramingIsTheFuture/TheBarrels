@@ -4,7 +4,12 @@ use bevy::{
     render::{camera::Camera, render_graph::base::camera::CAMERA_3D},
 };
 
-use crate::player::types::{Player, PlayerType};
+use crate::player::types::Player;
+
+const SPRITE_FRONT: i8 = 3; // 0 - 3
+const SPRITE_BACK: i8 = 7; // 4 - 7
+const SPRITE_RIGHT: i8 = 11; // 8 - 11
+const SPRITE_LEFT: i8 = 15; // 12 - 15
 
 pub struct PlayerInfo;
 
@@ -13,19 +18,31 @@ pub struct PlayerPlugin {}
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_startup_stage("Spawn player", SystemStage::single(setup_player.system()))
-            .add_system(move_champ.system());
+            .add_system(move_champ.system())
+            .add_system(animate_sprite_system.system());
     }
 }
 
-fn setup_player(mut commands: Commands, player_type: Res<PlayerType>) {
+fn setup_player(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+) {
     commands.insert_resource(Player::default());
 
+    let h = TextureAtlas::from_grid(
+        asset_server.load("sprites/pirate_1.png"),
+        Vec2::new(16.0, 16.0),
+        4,
+        4,
+    );
+
     commands
-        .spawn_bundle(SpriteBundle {
-            material: player_type.player.clone(),
+        .spawn_bundle(SpriteSheetBundle {
+            texture_atlas: texture_atlases.add(h),
             transform: Transform {
                 translation: Vec3::new(0., 0., 3.),
-                scale: Vec3::new(0.001, 0.001, 0.001),
+                scale: Vec3::new(0.2, 0.2, 0.2),
                 ..Default::default()
             },
             ..Default::default()
@@ -53,6 +70,10 @@ fn move_champ(
     )>,
     mut player: ResMut<Player>,
 ) {
+    if !player.is_changed() {
+        player.moving = false;
+    }
+
     for mut transform in query.q0_mut().iter_mut() {
         // Receiving the speed for this character
         let speed = get_speed(player.char_code);
@@ -60,18 +81,30 @@ fn move_champ(
         if keyboard_input.pressed(KeyCode::W) {
             transform.translation.y += speed;
             player.y = transform.translation.y;
+            player.direction = SPRITE_BACK;
+            player.moving = true;
+            continue;
         }
         if keyboard_input.pressed(KeyCode::S) {
             transform.translation.y -= speed;
             player.y = transform.translation.y;
+            player.direction = SPRITE_FRONT;
+            player.moving = true;
+            continue;
         }
         if keyboard_input.pressed(KeyCode::A) {
             transform.translation.x -= speed;
             player.x = transform.translation.x;
+            player.direction = SPRITE_LEFT;
+            player.moving = true;
+            continue;
         }
         if keyboard_input.pressed(KeyCode::D) {
             transform.translation.x += speed;
             player.x = transform.translation.x;
+            player.direction = SPRITE_RIGHT;
+            player.moving = true;
+            continue;
         }
     }
 
@@ -81,6 +114,35 @@ fn move_champ(
             transform.translation.x = player.x;
             transform.translation.y = player.y;
             *transform = transform.looking_at(Vec3::from([player.x, player.y, 0.0]), Vec3::Y);
+        }
+    }
+}
+
+fn animate_sprite_system(
+    time: Res<Time>,
+    mut query: Query<(&mut Timer, &mut TextureAtlasSprite)>,
+    player: Res<Player>,
+) {
+    for (mut timer, mut sprite) in query.iter_mut() {
+        timer.tick(time.delta());
+        if timer.finished() {
+            let move_dir = player.direction;
+
+            if !player.moving {
+                sprite.index = (move_dir - 3) as u32;
+                continue;
+            }
+
+            if (move_dir - 3) > (sprite.index as i8) || (sprite.index as i8) > move_dir {
+                sprite.index = (move_dir - 3) as u32;
+                continue;
+            }
+            if move_dir == (sprite.index as i8) {
+                sprite.index = (move_dir - 3) as u32;
+                continue;
+            }
+            sprite.index += 1;
+            continue;
         }
     }
 }

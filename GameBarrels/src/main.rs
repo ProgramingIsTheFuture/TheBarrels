@@ -23,7 +23,6 @@ fn main() {
     }
 
     app_builder.add_startup_system(setup_camera.system());
-    app_builder.add_startup_system(setup.system());
 
     app_builder.run();
 }
@@ -38,15 +37,4 @@ fn setup_camera(mut commands: Commands) {
 
     commands.spawn_bundle(UiCameraBundle::default());
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-}
-
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-) {
-    // Insert character sprites
-    commands.insert_resource(player::types::PlayerType {
-        player: materials.add(asset_server.load("sprites/default.png").into()),
-    });
 }

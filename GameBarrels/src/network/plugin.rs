@@ -3,7 +3,7 @@ use std::io;
 use std::net;
 
 use crate::player::plugin::PlayerInfo;
-use crate::player::types::{Player, PlayerType};
+use crate::player::types::Player;
 
 pub struct Network {
     pub socket: net::UdpSocket,
@@ -48,11 +48,11 @@ fn send_data(
                 id: player.id.to_string(),
                 x: player.x,
                 y: player.y,
+                direction: player.direction,
+                moving: player.moving,
                 char_code: player.char_code,
             };
             let j = serde_json::to_string(&p).unwrap();
-
-            println!("Sending my data");
 
             match network.socket.send_to(j.as_bytes(), network.server) {
                 Ok(_) => return,
@@ -64,8 +64,9 @@ fn send_data(
 
 fn recv_data(
     mut commands: Commands,
-    player_type: Res<PlayerType>,
     mut query: Query<(&mut Player, &mut Transform)>,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     network: ResMut<Network>,
 ) {
     let mut buf = [0; 1024];
@@ -107,10 +108,17 @@ fn recv_data(
         continue;
     }
 
+    let h = TextureAtlas::from_grid(
+        asset_server.load("sprites/pirate_1.png"),
+        Vec2::new(16.0, 16.0),
+        4,
+        4,
+    );
+
     // Spwan a new user
     commands
-        .spawn_bundle(SpriteBundle {
-            material: player_type.player.clone(),
+        .spawn_bundle(SpriteSheetBundle {
+            texture_atlas: texture_atlases.add(h),
             transform: Transform {
                 translation: Vec3::new(0., 0., 3.),
                 scale: Vec3::new(0.001, 0.001, 0.001),
