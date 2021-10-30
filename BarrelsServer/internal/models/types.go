@@ -5,7 +5,7 @@ type Client struct {
 	Client *ClientSend
 }
 
-type ClientSend struct {
+type Player struct {
 	ID        string  `json:"id"`
 	X         float32 `json:"x"`
 	Y         float32 `json:"y"`
@@ -13,6 +13,11 @@ type ClientSend struct {
 	Moving    bool    `json:"moving"`
 	CharCode  int8    `json:"char_code"`
 	Username  string  `json:"username"`
+}
+
+type ClientSend struct {
+	Action string `json:"action"`
+	Player Player `json:"data"`
 }
 
 type Server struct {

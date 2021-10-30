@@ -4,7 +4,8 @@ use bevy::{
     render::{camera::Camera, render_graph::base::camera::CAMERA_3D},
 };
 
-use crate::player::types::Player;
+use crate::network::plugin::Network;
+use crate::player::types::{Action, Player};
 
 const SPRITE_FRONT: i8 = 3; // 0 - 3
 const SPRITE_BACK: i8 = 7; // 4 - 7
@@ -28,8 +29,10 @@ fn setup_player(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    network: ResMut<Network>,
 ) {
-    commands.insert_resource(Player::default());
+    let player = Player::default();
+    commands.insert_resource(player.clone());
 
     let h = TextureAtlas::from_grid(
         asset_server.load("sprites/pirate_1.png"),
@@ -51,6 +54,26 @@ fn setup_player(
         })
         .insert(Timer::from_seconds(0.05, true))
         .insert(PlayerInfo);
+
+    let p: Player = Player {
+        username: player.username.to_string(),
+        id: player.id.to_string(),
+        x: player.x,
+        y: player.y,
+        direction: player.direction,
+        moving: player.moving,
+        char_code: player.char_code,
+    };
+    let j = serde_json::to_string(&Action {
+        action: "spawn".to_string(),
+        data: p,
+    })
+    .unwrap();
+
+    match network.socket.send_to(j.as_bytes(), network.server) {
+        Ok(_) => return,
+        Err(_) => return,
+    };
 }
 
 // This func receives the speed base on the character number

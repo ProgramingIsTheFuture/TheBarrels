@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Player {
     pub id: String,
     pub x: f32,
@@ -27,4 +27,10 @@ impl Default for Player {
             char_code: 1,
         }
     }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Action<T> {
+    pub action: String,
+    pub data: T,
 }

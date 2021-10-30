@@ -1,4 +1,4 @@
-package udp
+package handlers
 
 import (
 	"BarrelsServer/internal/models"
@@ -43,10 +43,6 @@ func Server(ctx context.Context, address string) (err error) {
 			if !exists {
 				serv.InsertNewUser(&client)
 			}
-			if len(serv.Clients) >= 1 {
-				fmt.Println("servClients: - ", serv.Clients[0].Client.Direction, serv.Clients[0].Client.Moving)
-
-			}
 			recv <- serv
 		}
 	}()
@@ -64,7 +60,6 @@ func Server(ctx context.Context, address string) (err error) {
 						}
 
 						addr, _ := net.ResolveUDPAddr("udp", j.IP)
-						fmt.Printf("Sending %s data - to %s", i.Client.Username, j.Client.Username)
 
 						jsonClient, _ := json.Marshal(i.Client)
 
