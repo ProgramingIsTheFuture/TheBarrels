@@ -2,6 +2,6 @@ version: "3"
 
 services:
   db:
-    image: scylladb/scylla
+    image: redis:6.2-alpine
     ports: 
-      - "9042:9042"
+      - "6379:6379"
