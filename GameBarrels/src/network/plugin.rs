@@ -12,7 +12,7 @@ pub struct Network {
 
 impl Default for Network {
     fn default() -> Self {
-        let socket = net::UdpSocket::bind("127.0.0.1:8888").expect("");
+        let socket = net::UdpSocket::bind("127.0.0.1:7777").expect("");
         socket.set_nonblocking(true).expect("Non Blocking failed");
         let server = net::SocketAddr::new(net::IpAddr::V4(net::Ipv4Addr::new(127, 0, 0, 1)), 9999);
         Self { socket, server }
@@ -40,6 +40,9 @@ fn send_data(
     time: Res<Time>,
     mut query: Query<&mut Timer, With<PlayerInfo>>,
 ) {
+    if !player.is_changed() {
+        return;
+    }
     for mut timer in query.iter_mut() {
         timer.tick(time.delta());
         if timer.finished() {
