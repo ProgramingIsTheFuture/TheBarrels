@@ -15,9 +15,11 @@ type Player struct {
 	Username  string  `json:"username"`
 }
 
+// This is going to be store inside redis as string
 type ClientSend struct {
-	Action string `json:"action"`
-	Player Player `json:"data"`
+	Action      string `json:"action"`
+	Player      Player `json:"data"`
+	DateChanged int64  `json:"date_changed"`
 }
 
 type Server struct {
