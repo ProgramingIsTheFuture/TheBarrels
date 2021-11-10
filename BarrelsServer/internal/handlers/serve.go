@@ -132,7 +132,6 @@ func (s *ServerStruct) sendData(recv chan models.Server, clientMsg chan models.C
 			}()
 		case client := <-clientMsg:
 			go func() {
-				fmt.Println("Client here")
 				strClient, err := stringify(client)
 				if err != nil {
 					fmt.Println("error converting to string")
