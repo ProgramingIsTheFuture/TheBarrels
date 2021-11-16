@@ -27,6 +27,8 @@ func Server(ctx context.Context, address string, db ports.Database) (err error) 
 		return
 	}
 
+	fmt.Println("Initializing the UDP server")
+
 	defer pc.Close()
 
 	// Channels to send data over the threads
@@ -88,6 +90,9 @@ func (s *ServerStruct) receivData(recv chan models.Server, clientMsg chan models
 
 		// Passing the server to the sendData
 		// recv <- serv
+
+		fmt.Printf("Server - Data received from {%s}\n", clientsend.Player.Username)
+
 		clientMsg <- client
 	}
 }
@@ -126,7 +131,6 @@ func (s *ServerStruct) sendData(recv chan models.Server, clientMsg chan models.C
 							return
 						}
 
-						fmt.Printf("packet-written: bytes=%s to=%s\n", string(jsonClient), addr.String())
 					}
 				}
 			}()
@@ -134,7 +138,6 @@ func (s *ServerStruct) sendData(recv chan models.Server, clientMsg chan models.C
 			go func() {
 				strClient, err := stringify(client)
 				if err != nil {
-					fmt.Println("error converting to string")
 					return
 				}
 
@@ -151,7 +154,6 @@ func (s *ServerStruct) sendData(recv chan models.Server, clientMsg chan models.C
 				if c != "" {
 					if c == strClient {
 						go func() {
-							fmt.Println("Its the same as before")
 							var c = client
 							c.Client.DateChanged = time.Now().Unix()
 							strC, err := stringify(c)
@@ -175,6 +177,7 @@ func (s *ServerStruct) sendData(recv chan models.Server, clientMsg chan models.C
 				}
 
 				if createNeeded {
+					fmt.Printf("Server - Creating new user {%s}\n", strClient)
 					err = s.DB.Set(client.IP, strClient)
 					if err != nil {
 						return
@@ -210,14 +213,13 @@ func (s *ServerStruct) SendAll(ip string) {
 		return
 	}
 
-	fmt.Println("New data is ---", val)
+	fmt.Printf("Server - Sending data {%s}\n", data)
 	for _, key := range all {
 		var k = strings.Split(key, "-")[1]
 		if k == ip {
 			continue
 		}
 
-		fmt.Println("ResolveADdr", k)
 		addr, err := net.ResolveUDPAddr("udp", k)
 		if err != nil {
 			continue
@@ -226,7 +228,6 @@ func (s *ServerStruct) SendAll(ip string) {
 		if err != nil {
 			continue
 		}
-		fmt.Println("Sent: --", data)
 	}
 }
 
