@@ -2,8 +2,10 @@ use bevy::prelude::*;
 use std::io;
 use std::net;
 
+use crate::global_state::entities::{EntitiesController, StateStruct};
 use crate::player::plugin::PlayerInfo;
 use crate::player::types::{Action, Player};
+use crate::windows::status::WindowStatus;
 
 pub struct Network {
     pub socket: net::UdpSocket,
@@ -12,7 +14,7 @@ pub struct Network {
 
 impl Default for Network {
     fn default() -> Self {
-        let socket = net::UdpSocket::bind("127.0.0.1:7777").expect("");
+        let socket = net::UdpSocket::bind("127.0.0.1:988").expect("");
         socket.set_nonblocking(true).expect("Non Blocking failed");
         let server = net::SocketAddr::new(net::IpAddr::V4(net::Ipv4Addr::new(127, 0, 0, 1)), 9999);
         Self { socket, server }
@@ -23,24 +25,47 @@ pub struct NetworkPlugin {}
 
 impl Plugin for NetworkPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_startup_system(start_network.system())
-            .add_system(send_data.system())
-            .add_system(recv_data.system());
+        app.add_system_set(
+            SystemSet::on_enter(WindowStatus::InGameWindow).with_system(init_network.system()),
+        )
+        .add_system_set(
+            SystemSet::on_exit(WindowStatus::InGameWindow).with_system(remove_network.system()),
+        )
+        .add_system(send_data.system())
+        .add_system(recv_data.system());
     }
 }
 
+fn init_network(mut state: ResMut<StateStruct>) {
+    state.network = Some(Network::default());
+}
+
+fn remove_network(mut state: ResMut<StateStruct>) {
+    state.network = None;
+}
+
 // insert the network resource
+/*
 fn start_network(mut commands: Commands) {
     commands.insert_resource(Network::default());
 }
+*/
 
 fn send_data(
-    network: ResMut<Network>,
-    player: Res<Player>,
+    state: Res<StateStruct>,
     time: Res<Time>,
     mut query: Query<&mut Timer, With<PlayerInfo>>,
 ) {
-    if !player.is_changed() {
+    let player = match state.player.clone() {
+        Some(v) => v,
+        None => return,
+    };
+    let network = match &state.network {
+        Some(v) => v,
+        None => return,
+    };
+
+    if !state.is_changed() {
         return;
     }
     for mut timer in query.iter_mut() {
@@ -75,8 +100,15 @@ fn recv_data(
     // query_remove: Query<(Entity), With<Player>>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    network: ResMut<Network>,
+    // network: ResMut<Network>,
+    state: Res<StateStruct>,
+    mut entities: ResMut<EntitiesController>,
 ) {
+    let network = match &state.network {
+        Some(v) => v,
+        None => return,
+    };
+
     let mut buf = [0; 1024];
 
     // This will try to receiv data
@@ -121,7 +153,7 @@ fn recv_data(
 
         // Spwan a new user
         let texture = texture_atlases.add(h);
-        commands
+        let ent = commands
             .spawn_bundle(SpriteSheetBundle {
                 texture_atlas: texture,
                 transform: Transform {
@@ -132,7 +164,10 @@ fn recv_data(
                 ..Default::default()
             })
             .insert(Timer::from_seconds(0.05, true))
-            .insert(player);
+            .insert(player)
+            .id();
+
+        entities.entities.push(ent);
         return;
     }
 

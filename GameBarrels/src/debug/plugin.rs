@@ -3,7 +3,8 @@ use bevy::{
     prelude::*,
 };
 
-use crate::player::types::Player;
+use crate::global_state::entities::{EntitiesController, StateStruct};
+use crate::windows::status::WindowStatus;
 
 pub struct DebugStrings {
     fps: f32,
@@ -33,20 +34,26 @@ pub struct DebugPlugin {}
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_plugin(FrameTimeDiagnosticsPlugin)
-            .add_startup_system(start_text.system())
+            .add_system_set(
+                SystemSet::on_enter(WindowStatus::InGameWindow).with_system(start_text.system()),
+            )
             .add_system(set_text.system());
     }
 }
 
 // Function to spwan the debug text on the screen
-fn start_text(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn start_text(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut entities: ResMut<EntitiesController>,
+) {
     // UI camera
     commands.spawn_bundle(UiCameraBundle::default());
 
     // Initialize the debug string (fps: 0, x: 0, y: 0)
     let debug_strings = DebugStrings::new();
 
-    commands
+    let ent = commands
         .spawn_bundle(TextBundle {
             style: Style {
                 align_self: AlignSelf::FlexEnd,
@@ -72,16 +79,24 @@ fn start_text(mut commands: Commands, asset_server: Res<AssetServer>) {
             ),
             ..Default::default()
         })
-        .insert(debug_strings);
+        .insert(debug_strings)
+        .id();
+
+    entities.entities.push(ent);
 }
 
 // This function set the value of the string
 // this will update the debug text with user info and with the FPS
 fn set_text(
     diagnostics: Res<Diagnostics>,
-    player: Res<Player>,
+    // player: Res<Player>,
+    state: Res<StateStruct>,
     mut query: Query<(&mut Text, &mut DebugStrings)>,
 ) {
+    let player = match state.player.clone() {
+        Some(v) => v,
+        None => return,
+    };
     for (mut text, mut debug_str) in query.iter_mut() {
         let mut fps: f32 = 0.0;
         if let Some(fps_diagnostic) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {

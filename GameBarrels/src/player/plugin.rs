@@ -4,8 +4,9 @@ use bevy::{
     render::{camera::Camera, render_graph::base::camera::CAMERA_3D},
 };
 
-use crate::network::plugin::Network;
+use crate::global_state::entities::{EntitiesController, StateStruct};
 use crate::player::types::{Action, Player};
+use crate::windows::status::WindowStatus;
 
 const SPRITE_FRONT: i8 = 3; // 0 - 3
 const SPRITE_BACK: i8 = 7; // 4 - 7
@@ -18,21 +19,51 @@ pub struct PlayerPlugin {}
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_startup_stage("Spawn player", SystemStage::single(setup_player.system()))
+        app // .add_startup_system(setup_player.system())
+            // .add_startup_system(setup_camera.system())
+            .add_system_set(
+                SystemSet::on_enter(WindowStatus::InGameWindow)
+                    .with_system(setup_player.system())
+                    .with_system(setup_camera.system()),
+            )
+            .add_system_set(
+                SystemSet::on_exit(WindowStatus::InGameWindow).with_system(exit_player.system()),
+            )
             .add_system(move_champ.system())
             .add_system(animate_o_players.system())
             .add_system(animate_sprite_system.system());
     }
 }
 
+fn setup_camera(mut commands: Commands, mut entities: ResMut<EntitiesController>) {
+    // Spawn the camera perspective
+    let ent = commands
+        .spawn_bundle(PerspectiveCameraBundle {
+            transform: Transform::from_xyz(00.0, 00.0, 50.0)
+                .looking_at(Vec3::from([0.0, 0.0, 0.0]), Vec3::Y),
+            ..Default::default()
+        })
+        .id();
+    entities.entities.push(ent);
+
+    let ent = commands.spawn_bundle(UiCameraBundle::default()).id();
+    entities.entities.push(ent);
+
+    let ent = commands
+        .spawn_bundle(OrthographicCameraBundle::new_2d())
+        .id();
+    entities.entities.push(ent);
+}
+
 fn setup_player(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    network: ResMut<Network>,
+    mut state_game: ResMut<StateStruct>,
+    mut entities: ResMut<EntitiesController>,
 ) {
     let player = Player::default();
-    commands.insert_resource(player.clone());
+    // commands.insert_resource(player.clone());
 
     let h = TextureAtlas::from_grid(
         asset_server.load("sprites/pirate_1.png"),
@@ -42,7 +73,7 @@ fn setup_player(
     );
 
     let texture = texture_atlases.add(h);
-    commands
+    let ent = commands
         .spawn_bundle(SpriteSheetBundle {
             texture_atlas: texture,
             transform: Transform {
@@ -53,7 +84,10 @@ fn setup_player(
             ..Default::default()
         })
         .insert(Timer::from_seconds(0.05, true))
-        .insert(PlayerInfo);
+        .insert(PlayerInfo)
+        .id();
+
+    entities.entities.push(ent);
 
     let p: Player = Player {
         username: player.username.to_string(),
@@ -66,14 +100,23 @@ fn setup_player(
     };
     let j = serde_json::to_string(&Action {
         action: "spawn".to_string(),
-        data: p,
+        data: p.clone(),
     })
     .unwrap();
 
-    match network.socket.send_to(j.as_bytes(), network.server) {
-        Ok(_) => return,
-        Err(_) => return,
+    state_game.player = Some(p.clone());
+
+    match &mut state_game.network {
+        Some(v) => match v.socket.send_to(j.as_bytes(), v.server) {
+            Ok(_) => return,
+            Err(_) => eprintln!("ERr network sending package"),
+        },
+        None => return,
     };
+}
+
+fn exit_player(mut state_game: ResMut<StateStruct>) {
+    state_game.player = None;
 }
 
 // This func receives the speed base on the character number
@@ -93,9 +136,15 @@ fn move_champ(
         Query<&mut Transform, With<PlayerInfo>>,
         Query<(&mut Transform, &Camera)>,
     )>,
-    mut player: ResMut<Player>,
+    // mut player: ResMut<Player>,
+    mut state_game: ResMut<StateStruct>,
 ) {
-    if !player.is_changed() {
+    let mut player = match state_game.player.clone() {
+        Some(v) => v,
+        None => return,
+    };
+
+    if !state_game.is_changed() {
         player.moving = false;
     }
 
@@ -141,6 +190,8 @@ fn move_champ(
             *transform = transform.looking_at(Vec3::from([player.x, player.y, 0.0]), Vec3::Y);
         }
     }
+
+    state_game.player = Some(player);
 }
 
 fn animate_o_players(
@@ -176,8 +227,13 @@ fn animate_o_players(
 fn animate_sprite_system(
     time: Res<Time>,
     mut query: Query<(&mut Timer, &mut TextureAtlasSprite), With<PlayerInfo>>,
-    player: Res<Player>,
+    // player: Res<Player>,
+    state_game: ResMut<StateStruct>,
 ) {
+    let player = match &state_game.player {
+        Some(v) => v,
+        None => return,
+    };
     for (mut timer, mut sprite) in query.iter_mut() {
         timer.tick(time.delta());
         if timer.finished() {
