@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 
+use crate::menu;
 use crate::network;
 use crate::player;
 
-use crate::global_state::entities::EntitiesController;
+use crate::global_state::entities::{EntitiesController, MenuEntitiesController};
 use crate::windows::status::WindowStatus;
 
 pub struct WindowsPlugin {}
@@ -18,6 +19,11 @@ impl Plugin for WindowsPlugin {
                 SystemSet::on_enter(WindowStatus::MenuWindow)
                     .with_system(handle_menu_window.system()),
             )
+            .add_system_set(
+                SystemSet::on_enter(WindowStatus::InGameWindow)
+                    .with_system(handle_game_window.system()),
+            )
+            .add_plugin(menu::plugin::MainMenu {})
             .add_plugin(player::plugin::PlayerPlugin {})
             .add_plugin(network::plugin::NetworkPlugin {})
             /*
@@ -27,6 +33,14 @@ impl Plugin for WindowsPlugin {
                 SystemSet::on_enter(WindowStatus::InGameWindow).with_system(setup_camera.system()),
             )*/;
     }
+}
+
+fn handle_game_window(mut commands: Commands, mut entities: ResMut<MenuEntitiesController>) {
+    for ent in entities.entities.iter_mut() {
+        commands.entity(ent.clone()).despawn();
+    }
+
+    entities.entities = vec![];
 }
 
 fn handle_menu_window(mut commands: Commands, mut entities: ResMut<EntitiesController>) {
@@ -41,10 +55,12 @@ fn handle_window_changer(
     keyboard_input: Res<Input<KeyCode>>,
     mut wind_status: ResMut<State<WindowStatus>>,
 ) {
-    if keyboard_input.just_released(KeyCode::Escape) {
-        match wind_status.current() {
-            WindowStatus::InGameWindow => wind_status.set(WindowStatus::MenuWindow),
-            WindowStatus::MenuWindow => wind_status.set(WindowStatus::InGameWindow),
-        };
-    }
+    match wind_status.current() {
+        WindowStatus::InGameWindow => {
+            if keyboard_input.just_released(KeyCode::Escape) {
+                wind_status.set(WindowStatus::MenuWindow);
+            }
+        }
+        WindowStatus::MenuWindow => {}
+    };
 }

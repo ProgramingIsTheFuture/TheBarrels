@@ -3,6 +3,7 @@ use std::env;
 
 mod debug;
 mod global_state;
+mod menu;
 mod network;
 mod player;
 mod windows;
@@ -18,6 +19,8 @@ fn main() {
     let mut app_builder = App::build();
 
     app_builder.insert_resource(global_state::entities::EntitiesController { entities: vec![] });
+    app_builder
+        .insert_resource(global_state::entities::MenuEntitiesController { entities: vec![] });
     app_builder.insert_resource(global_state::entities::StateStruct::default());
 
     app_builder.add_plugin(windows::plugin::WindowsPlugin {});
