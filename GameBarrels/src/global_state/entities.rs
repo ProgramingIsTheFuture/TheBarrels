@@ -7,6 +7,11 @@ pub struct EntitiesController {
     pub entities: Vec<Entity>,
 }
 
+#[derive(Debug)]
+pub struct MenuEntitiesController {
+    pub entities: Vec<Entity>,
+}
+
 pub struct StateStruct {
     pub player: Option<Player>,
     pub network: Option<Network>,

@@ -62,7 +62,11 @@ fn setup_player(
     mut state_game: ResMut<StateStruct>,
     mut entities: ResMut<EntitiesController>,
 ) {
-    let player = Player::default();
+    let player: Player = match state_game.player.clone() {
+        Some(v) => v,
+        None => Player::default(),
+    };
+
     // commands.insert_resource(player.clone());
 
     let h = TextureAtlas::from_grid(
@@ -116,7 +120,7 @@ fn setup_player(
 }
 
 fn exit_player(mut state_game: ResMut<StateStruct>) {
-    state_game.player = None;
+    //state_game.player = None;
 }
 
 // This func receives the speed base on the character number
@@ -182,12 +186,13 @@ fn move_champ(
         }
     }
 
+    println!("Updating camera");
     // This func is going to focus the camera on the character
     for (mut transform, camera) in query.q1_mut().iter_mut() {
         if camera.name == Some(CAMERA_3D.to_string()) {
             transform.translation.x = player.x;
             transform.translation.y = player.y;
-            *transform = transform.looking_at(Vec3::from([player.x, player.y, 0.0]), Vec3::Y);
+            //*transform = transform.looking_at(Vec3::from([player.x, player.y, 0.0]), Vec3::Y);
         }
     }
 
