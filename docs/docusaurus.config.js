@@ -8,12 +8,12 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
 	title: "TheBarrels",
 	tagline: "RPG 2D Multiplayer game",
-	url: "http://localhost:3000",
-	baseUrl: "/",
+	url: "https://ProgramingIsTheFuture.github.io",
+	baseUrl: process.env.DEPLOY == "true" ? "/TheBarrels/" : "/",
 	onBrokenLinks: "throw",
 	onBrokenMarkdownLinks: "warn",
 	favicon: "img/favicon.ico",
-	organizationName: "github.com/ProgramingIsTheFuture/TheBarrels", // Usually your GitHub org/user name.
+	organizationName: "ProgramingIsTheFuture", // Usually your GitHub org/user name.
 	projectName: "TheBarrels", // Usually your repo name.
 
 	presets: [
@@ -23,15 +23,9 @@ const config = {
 			({
 				docs: {
 					sidebarPath: require.resolve("./sidebars.js"),
-					// Please change this to your repo.
-					editUrl:
-						"https://github.com/ProgramingIsTheFuture/TheBarrels",
 				},
 				blog: {
 					showReadingTime: true,
-					// Please change this to your repo.
-					editUrl:
-						"https://github.com/ProgramingIsTheFuture/TheBarrels",
 				},
 				theme: {
 					customCss: require.resolve("./src/css/custom.css"),

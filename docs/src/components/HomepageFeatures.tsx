@@ -21,24 +21,23 @@ const FeatureList: FeatureItem[] = [
 		),
 	},
 	{
-		title: "Focus on What Matters",
+		title: "Online",
 		image: "/img/undraw_docusaurus_tree.svg",
 		description: (
 			<>
-				Docusaurus lets you focus on your docs, and we&apos;ll do the
-				chores. Go ahead and move your docs into the <code>docs</code>{" "}
-				directory.
+				Game to play with all your friends. We aim in network
+				performance and let you can communicate with all your friends.
 			</>
 		),
 	},
 	{
-		title: "Powered by React",
+		title: "Open Source",
 		image: "/img/undraw_docusaurus_react.svg",
 		description: (
 			<>
-				Extend or customize your website layout by reusing React.
-				Docusaurus can be extended while reusing the same header and
-				footer.
+				Feel free to help me develop this project! You can find a lot of
+				documentation here and if this is not enough, you can find more
+				on my github repo!{" "}
 			</>
 		),
 	},
