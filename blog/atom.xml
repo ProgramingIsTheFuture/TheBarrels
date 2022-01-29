@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://ProgramingIsTheFuture.github.io/blog</id>
+    <id>https://ProgramingIsTheFuture.github.io/TheBarrels/blog</id>
     <title>TheBarrels Blog</title>
     <updated>2022-01-29T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://ProgramingIsTheFuture.github.io/blog"/>
+    <link rel="alternate" href="https://ProgramingIsTheFuture.github.io/TheBarrels/blog"/>
     <subtitle>TheBarrels Blog</subtitle>
-    <icon>https://ProgramingIsTheFuture.github.io/img/favicon.ico</icon>
+    <icon>https://ProgramingIsTheFuture.github.io/TheBarrels/img/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[TheBarrels]]></title>
         <id>thebarrls</id>
-        <link href="https://ProgramingIsTheFuture.github.io/blog/thebarrls"/>
+        <link href="https://ProgramingIsTheFuture.github.io/TheBarrels/blog/thebarrls"/>
         <updated>2022-01-29T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[This is the first blog post about TheBarrels.]]></summary>
         <content type="html"><![CDATA[<p>This is the first blog post about TheBarrels.</p>]]></content>

@@ -2,14 +2,14 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title>TheBarrels Blog</title>
-        <link>https://ProgramingIsTheFuture.github.io/blog</link>
+        <link>https://ProgramingIsTheFuture.github.io/TheBarrels/blog</link>
         <description>TheBarrels Blog</description>
         <lastBuildDate>Sat, 29 Jan 2022 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <item>
             <title><![CDATA[TheBarrels]]></title>
-            <link>https://ProgramingIsTheFuture.github.io/blog/thebarrls</link>
+            <link>https://ProgramingIsTheFuture.github.io/TheBarrels/blog/thebarrls</link>
             <guid>thebarrls</guid>
             <pubDate>Sat, 29 Jan 2022 00:00:00 GMT</pubDate>
             <description><![CDATA[This is the first blog post about TheBarrels.]]></description>
