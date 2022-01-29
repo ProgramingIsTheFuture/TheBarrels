@@ -12,6 +12,4 @@
 
 # Demo 
 
-<video width="600" height="330" controls>
-  <source src="TheBarrelsDemo.gif" type="video/mp4">
-</video>
+![](https://github.com/ProgramingIsTheFuture/TheBarrels/blob/master/TheBarrelsDemo.gif)
