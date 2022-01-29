@@ -21,11 +21,11 @@ services:
       context: ./BarrelsServer
       dockerfile: Dockerfile
     depends_on:
-      - "db"
+      - "udp-db"
     ports:
       - "9999:9999"
 
-  db:
+  udp-db:
     image: redis:6.2-alpine
     ports: 
       - "6379:6379"

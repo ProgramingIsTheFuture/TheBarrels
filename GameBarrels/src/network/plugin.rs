@@ -14,7 +14,7 @@ pub struct Network {
 
 impl Default for Network {
     fn default() -> Self {
-        let socket = net::UdpSocket::bind("127.0.0.1:988").expect("");
+        let socket = net::UdpSocket::bind("127.0.0.1:999").expect("");
         socket.set_nonblocking(true).expect("Non Blocking failed");
         let server = net::SocketAddr::new(net::IpAddr::V4(net::Ipv4Addr::new(127, 0, 0, 1)), 9999);
         Self { socket, server }

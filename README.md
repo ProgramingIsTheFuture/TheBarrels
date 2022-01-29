@@ -2,6 +2,10 @@
 
 2D RPG Game Online
 
+# Docs
+
+You can read more at: https://programingisthefuture.github.io/TheBarrels
+
 # Server
 
 - Default Port: 9999
