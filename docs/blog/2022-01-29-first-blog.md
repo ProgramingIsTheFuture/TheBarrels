@@ -6,3 +6,4 @@ tags: [TheBarrels, start, welcome]
 ---
 
 This is the first blog post about TheBarrels.
+

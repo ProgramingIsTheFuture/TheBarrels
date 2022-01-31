@@ -100,8 +100,9 @@ const config = {
 				copyright: `Copyright © ${new Date().getFullYear()} TheBarrels, Inc. Built with Docusaurus.`,
 			},
 			prism: {
-				theme: lightCodeTheme,
 				darkTheme: darkCodeTheme,
+				theme: lightCodeTheme,
+				additionalLanguages: ["rust", "go"],
 			},
 		}),
 };
