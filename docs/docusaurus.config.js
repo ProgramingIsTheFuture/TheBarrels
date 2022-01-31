@@ -12,7 +12,7 @@ const config = {
 	baseUrl: process.env.DEPLOY == "true" ? "/TheBarrels/" : "/",
 	onBrokenLinks: "throw",
 	onBrokenMarkdownLinks: "warn",
-	favicon: "img/favicon.ico",
+	favicon: "logo.ico",
 	organizationName: "ProgramingIsTheFuture", // Usually your GitHub org/user name.
 	projectName: "TheBarrels", // Usually your repo name.
 
@@ -41,7 +41,7 @@ const config = {
 				title: "TheBarrels",
 				logo: {
 					alt: "TheBarrls Logo",
-					src: "img/logo.svg",
+					src: "characters/character_1_Erik.svg",
 				},
 				items: [
 					{

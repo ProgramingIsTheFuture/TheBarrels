@@ -11,12 +11,12 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
 	{
-		title: "Easy to Use",
-		image: "/img/undraw_docusaurus_mountain.svg",
+		title: "style",
+		image: "/characters/character_1_Erik.svg",
 		description: (
 			<>
-				Docusaurus was designed from the ground up to be easily
-				installed and used to get your website up and running quickly.
+				Game with pixel art style, highly inspired by the the flying
+				spaghetti monster, vikings and pirates.
 			</>
 		),
 	},
