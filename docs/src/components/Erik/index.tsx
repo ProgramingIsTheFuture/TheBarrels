@@ -1,7 +1,7 @@
 import React from "react";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-const Eric = ({
+const Erik = ({
 	width,
 	height,
 	svg_path,
@@ -19,4 +19,4 @@ const Eric = ({
 	);
 };
 
-export default Eric;
+export default Erik;
